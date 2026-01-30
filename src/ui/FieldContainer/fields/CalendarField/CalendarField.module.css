@@ -1,0 +1,49 @@
+.inputRow {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding-right: 2rem;
+}
+
+.input {
+    width: 100%;
+    border: none;
+    border-bottom: 2px solid #ababab;
+    border-radius: 0%;
+    padding: 0.5rem 2.5rem 0.25rem 0;
+    font-size: 1rem;
+    outline: none;
+    background: transparent;
+}
+
+.inputError {
+  border-bottom-color: #d32f2f;
+  border-bottom-style: solid;
+}
+
+.ant-picker {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+}
+
+.ant-picker-input input {
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    border-bottom: 2px solid #ababab;
+    padding: 0.5rem 0 0.25rem 0;
+    font-size: 1rem;
+}
+
+.ant-picker-suffix {
+    display: none;
+}
+
+.errorText {
+    font-size: 0.75rem;
+    color: #d32f2f;
+}

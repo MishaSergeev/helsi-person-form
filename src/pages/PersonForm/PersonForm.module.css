@@ -1,0 +1,39 @@
+.form {
+  max-width: 100%;
+  margin: 0px 1rem;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.gridThree {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 2rem;
+  row-gap: 1.5rem;
+  width: 100%;
+  align-items: start;
+}
+
+.gridTwo {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 2rem;
+  row-gap: 1.5rem;
+  width: 100%;
+  align-items: start;
+}
+
+.buttonWrapper {
+  text-align: center;
+  margin: 1rem 0;
+}
+
+@media (max-width: 768px) {
+  .gridThree {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+
+  .gridTwo {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}

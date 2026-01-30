@@ -1,0 +1,65 @@
+.wrapper {
+    position: relative;
+    width: 100%;
+    padding-right: 2rem;
+    padding-top: 0.2rem;
+}
+
+.control {
+    padding: 0.2rem 0;
+    border-bottom: 2px solid #ababab;
+    cursor: pointer;
+    user-select: none;
+}
+
+.focus {
+    border-bottom-color: #3f6de0;
+}
+
+.errorBorder {
+    border-bottom-color: #d32f2f;
+}
+
+.menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    padding-left: 0px;
+    background: #5f6062;
+    border-radius: 4px;
+    overflow: hidden;
+    z-index: 10;
+}
+
+.option {
+    position: relative;
+    padding: 0.6rem 0.75rem 0.6rem 2rem;
+    color: #fff;
+    cursor: pointer;
+}
+
+.option:hover {
+    background: #6f8fe8;
+}
+
+.selected {
+    background: #6f8fe8;
+}
+
+.check {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    width: 6px;
+    height: 10px;
+    border-right: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    transform: translateY(-50%) rotate(45deg);
+}
+
+.error {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: #d32f2f;
+}
