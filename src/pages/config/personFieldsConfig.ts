@@ -7,16 +7,18 @@ import {
   email,
   phoneUA,
   twoLettersNineDigits,
-  //documentNumber,
-  personalIdValidator
+  documentNumber,
+  personalIdValidator,
 } from "../../utils/validators";
+
+type Validator = (value: any, allValues?: Record<string, any>) => string | undefined;
 
 type BaseFieldProps = {
   name: string;
   label?: string;
   required?: boolean;
   backgroundValue?: string;
-  validate?: (value: any) => string | undefined;
+  validate?: Validator;
   errorText?: string;
   optional?: boolean;
   optionalToggleName?: string;
@@ -159,7 +161,13 @@ export const patientDocumentFields: FieldProps[] = [
     type: "text",
     name: "documentNumber",
     backgroundValue: "Серія (за наявності), номер*",
-    validate: twoLettersNineDigits,
+    validate: (value, allValues) => {
+      const type = allValues?.documentType;
+      if (type === "Паспорт (ID-картка)" || type === "Паспорт (книжечка)") {
+        return twoLettersNineDigits(value);
+      }
+      return documentNumber(value);
+    },
   },
   {
     type: "calendar",
@@ -184,6 +192,6 @@ export const patientDocumentFields: FieldProps[] = [
     label: "Запис №(УНЗР)",
     backgroundValue: "РРРРММДД-ХХХХХ",
     validate: personalIdValidator,
-    bottomText:"Вкажіть унікальний номер запису в Демографічному реєстрі (Запис №)",
+    bottomText: "Вкажіть унікальний номер запису в Демографічному реєстрі (Запис №)",
   },
 ];
