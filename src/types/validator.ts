@@ -1,0 +1,1 @@
+export type Validator<T = any> = (value: T, allValues?: Record<string, any>) => string | undefined;

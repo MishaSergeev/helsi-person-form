@@ -1,5 +1,8 @@
+import { useConditionalValidation } from "../../hooks/useConditionalValidation";
+import type { Validator } from "../../types/validator";
 import {
-  required,
+  //required,
+  calendarValidator,
   inp,
   minThreeLetters,
   requiredSelect,
@@ -11,14 +14,11 @@ import {
   personalIdValidator,
 } from "../../utils/validators";
 
-type Validator = (value: any, allValues?: Record<string, any>) => string | undefined;
-
-type BaseFieldProps = {
+type BaseFieldProps<T = any> = {
   name: string;
   label?: string;
-  required?: boolean;
   backgroundValue?: string;
-  validate?: Validator;
+  validate?: Validator<T>;
   errorText?: string;
   optional?: boolean;
   optionalToggleName?: string;
@@ -28,13 +28,13 @@ type BaseFieldProps = {
   bottomText?: string;
 };
 
-export type TextProps = BaseFieldProps & { type: "text" };
-export type SelectProps = BaseFieldProps & {
+export type TextProps = BaseFieldProps<string> & { type: "text" };
+export type SelectProps = BaseFieldProps<string> & {
   type: "select";
   placeholder: string;
   options: { label: string; value: string }[];
 };
-export type CalendarProps = BaseFieldProps & { type: "calendar" };
+export type CalendarProps = BaseFieldProps<Date | string> & { type: "calendar" };
 
 export type FieldProps = TextProps | SelectProps | CalendarProps;
 
@@ -56,7 +56,6 @@ export const patientDataFields: FieldProps[] = [
     name: "middleName",
     label: "По батькові*",
     validate: minThreeLetters,
-    errorText: "поле не може бути пустим",
     optional: true,
     optionalToggleName: "isMiddleName",
     disabledValue: "Немає по батькові",
@@ -68,18 +67,17 @@ export const patientDataFields: FieldProps[] = [
     name: "inp",
     label: "РНОКПП (ІНП)*",
     validate: inp,
-    errorText: "поле не може бути пустим",
     optional: true,
     optionalToggleName: "isInp",
-    disabledValue: "Немає по батькові",
-    optionalHint: "Немає по батькові згідно документів",
+    disabledValue: "Немає РНОКПП (ІНП)",
+    optionalHint: "Немає ІНП чи має відмітку у паспорті",
     optionalToggleDefault: true,
   },
   {
     type: "calendar",
     name: "birthDate",
     label: "Дата народження*",
-    validate: required,
+    validate: calendarValidator({ allowFuture: false }),
   },
   {
     type: "select",
@@ -161,24 +159,31 @@ export const patientDocumentFields: FieldProps[] = [
     type: "text",
     name: "documentNumber",
     backgroundValue: "Серія (за наявності), номер*",
-    validate: (value, allValues) => {
-      const type = allValues?.documentType;
-      if (type === "Паспорт (ID-картка)" || type === "Паспорт (книжечка)") {
-        return twoLettersNineDigits(value);
-      }
-      return documentNumber(value);
-    },
+    validate: useConditionalValidation({
+      dependsOn: "documentType",
+      rules: [
+        {
+          when: ["Паспорт (ID-картка)", "Паспорт (книжечка)"],
+          validate: twoLettersNineDigits,
+        },
+        {
+          when: ["*"],
+          validate: documentNumber,
+        },
+      ],
+    }),
   },
   {
     type: "calendar",
     name: "issuedBy",
     label: "Коли видано*",
-    validate: required,
+    validate: calendarValidator({ allowFuture: false }),
   },
   {
     type: "calendar",
     name: "issuedAt",
     label: "Діє до",
+    validate: calendarValidator(),
   },
   {
     type: "text",

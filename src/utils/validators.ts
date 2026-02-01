@@ -1,13 +1,45 @@
 import dayjs from "dayjs";
+import type { Validator } from "../types/validator";
 
-export const required = (v?: string) =>
+interface CalendarValidatorOptions {
+    allowFuture?: boolean;
+    errorTextEmpty?: string;
+    errorTextInvalid?: string;
+    errorTextFuture?: string;
+}
+
+export const required: Validator<string | undefined> = (v) =>
     v ? undefined : "поле не може бути пустим";
 
-export const inp = (v?: string) =>
+export const calendarValidator = (
+  options: CalendarValidatorOptions = {}
+): Validator<string | Date | undefined> => {
+  const {
+    allowFuture = true,
+    errorTextEmpty = "поле не може бути пустим",
+    errorTextInvalid = "некоректна дата",
+    errorTextFuture = "дата не може бути в майбутньому",
+  } = options;
+
+  return (value) => {
+    if (!value) return errorTextEmpty;
+
+    const date = dayjs(value instanceof Date ? value : value);
+    if (!date.isValid()) return errorTextInvalid;
+
+    if (!allowFuture && date.isAfter(dayjs())) return errorTextFuture;
+
+    return undefined;
+  };
+};
+
+export const inp: Validator<string | undefined> = (v) =>
     !v || !v.trim() || v && !/^\d{10}$/.test(v) ? "ІПН має містити 10 цифр" : undefined;
 
-export const minThreeLetters = (v?: string) => {
-    if (!v || !v.trim()) return "поле не може бути пустим";
+export const minThreeLetters: Validator<string | undefined> = (v) => {
+    if (!v || !v.trim()) {
+        return "поле не може бути пустим";
+    }
 
     const value = v.replace(/\s/g, "");
 
@@ -20,7 +52,7 @@ export const minThreeLetters = (v?: string) => {
     return undefined;
 }
 
-export const minSixLetters = (v?: string) => {
+export const minSixLetters: Validator<string | undefined> = (v) => {
     if (!v || !v.trim()) {
         return "поле не може бути пустим";
     }
@@ -32,10 +64,10 @@ export const minSixLetters = (v?: string) => {
     return undefined;
 };
 
-export const requiredSelect = (value?: string) =>
-    value && value !== "" ? undefined : "поле не може бути пустим";
+export const requiredSelect = (v?: string) =>
+    v && v !== "" ? undefined : "поле не може бути пустим";
 
-export const email = (v?: string) => {
+export const email: Validator<string | undefined> = (v) => {
     if (!v || !v.trim()) {
         return "поле не може бути пустим";
     }
@@ -46,10 +78,11 @@ export const email = (v?: string) => {
     return undefined;
 }
 
-export const phoneUA = (v?: string) => {
+export const phoneUA: Validator<string | undefined> = (v) => {
     if (!v || !v.trim()) {
         return "поле не може бути пустим";
     }
+    
     const cleaned = v.replace(/\D/g, "");
 
     const validOperators = [
@@ -65,7 +98,7 @@ export const phoneUA = (v?: string) => {
     return undefined;
 };
 
-export const twoLettersNineDigits = (v?: string) => {
+export const twoLettersNineDigits: Validator<string | undefined> = (v) => {
     if (!v || !v.trim()) {
         return "поле не може бути пустим";
     }
@@ -80,7 +113,7 @@ export const twoLettersNineDigits = (v?: string) => {
     return undefined;
 };
 
-export const documentNumber = (v?: string) => {
+export const documentNumber: Validator<string | undefined> = (v) => {
     if (!v || !v.trim()) {
         return "поле не може бути пустим";
     }
@@ -96,12 +129,12 @@ export const documentNumber = (v?: string) => {
     return undefined;
 };
 
-const calculateICAOChecksum = (value: string): number => {
+const calculateICAOChecksum = (v: string): number => {
     const weights = [7, 3, 1];
     let sum = 0;
 
-    for (let i = 0; i < value.length; i++) {
-        const char = value[i].toUpperCase();
+    for (let i = 0; i < v.length; i++) {
+        const char = v[i].toUpperCase();
 
         let val: number;
 
@@ -122,35 +155,35 @@ const calculateICAOChecksum = (value: string): number => {
 };
 
 
-export const personalIdValidator = (v?: string) => {
-  if (!v || !v.trim()) {
-    return "Поле не може бути пустим";
-  }
+export const personalIdValidator: Validator<string | undefined> = (v) => {
+    if (!v || !v.trim()) {
+        return "Поле не може бути пустим";
+    }
 
-  const value = v.trim();
+    const value = v.trim();
 
-  const regex = /^(\d{8})-(\d{4})(\d)$/;
-  const match = value.match(regex);
+    const regex = /^(\d{8})-(\d{4})(\d)$/;
+    const match = value.match(regex);
 
-  if (!match) {
-    return "Номер введено некоректно, формат має бути РРРРММДД-ХХХХК";
-  }
+    if (!match) {
+        return "Номер введено некоректно, формат має бути РРРРММДД-ХХХХК";
+    }
 
-  const [, dateStr, seqStr, checkDigitStr] = match;
+    const [, dateStr, seqStr, checkDigitStr] = match;
 
-  if (!dayjs(dateStr, "YYYYMMDD", true).isValid()) {
-    return "Некоректна дата народження";
-  }
+    if (!dayjs(dateStr, "YYYYMMDD", true).isValid()) {
+        return "Некоректна дата народження";
+    }
 
-  const seq = parseInt(seqStr, 10);
-  if (seq < 1 || seq > 9999) {
-    return "Порядковий номер має бути в діапазоні 0001–9999";
-  }
+    const seq = parseInt(seqStr, 10);
+    if (seq < 1 || seq > 9999) {
+        return "Порядковий номер має бути в діапазоні 0001–9999";
+    }
 
-  const expectedCheck = calculateICAOChecksum(dateStr + seqStr);
-  if (expectedCheck !== parseInt(checkDigitStr, 10)) {
-    return "Контрольна цифра некоректна";
-  }
+    const expectedCheck = calculateICAOChecksum(dateStr + seqStr);
+    if (expectedCheck !== parseInt(checkDigitStr, 10)) {
+        return "Контрольна цифра некоректна";
+    }
 
-  return undefined;
+    return undefined;
 };
